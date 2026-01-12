@@ -1,0 +1,28 @@
+﻿@page "/ToDo"
+
+@rendermode InteractiveServer 
+
+<h3>ToDo</h3>
+
+<input type="button" class="btn btn-primary" value="Add Task"
+   @onclick="@(()=>{
+         tasks.Insert(0,new ToDoTask{ Id= tasks.Count()+1, TaskName="",IsCompleted=false});
+        })"/>
+            
+        <br />
+        <br />
+<Virtualize Items="tasks" Context="task">
+   <div @key="task.Id">
+        <input type="checkbox" class="form-check-input" @bind-value="task.IsCompleted" />
+        <InputText class="" @bind-Value="task.TaskName" />
+   </div>    
+</Virtualize>
+
+@code {
+    private List<ToDoTask> tasks = new List<ToDoTask>();
+
+    protected override void OnParametersSet()
+    {
+        tasks  = ToDoRepository.GetAllTask().OrderByDescending(x => x.TaskName).ThenBy(x=>x.IsCompleted).ToList();
+    }
+}

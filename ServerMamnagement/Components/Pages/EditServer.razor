@@ -1,0 +1,50 @@
+﻿@page "/servers/edit/{id:int}"
+
+<h3>EditServer</h3>
+
+
+<EditForm Enhance="true" FormName="server" Model="server" OnSubmit="SaveUpdate">
+    <div class="form-control">
+        <InputNumber class="form-control" @bind-Value="server.Id" hidden />
+      
+            <div class="row">
+                <InputText class="form-control" @bind-Value="server.Name" />
+            </div>
+            <br />
+            <div class="row">
+                <InputText class="form-control" @bind-Value="server.City" />
+            </div>
+            <br />
+            <div>
+                <InputCheckbox class="form-check" @bind-Value="server.IsOnline" />
+            </div>
+            <button type="submit"> Submit</button>
+    </div>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Server? server { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if(server == null)
+        server  = ServersRepository.GetServerById(id)?? new Server();
+    }
+
+    private void SaveUpdate()
+    {
+        if (server.Id != 0)
+        {
+            ServersRepository.UpdateServer(server.Id,server);
+        }
+        else
+        {
+            ServersRepository.AddServer(server);
+        }
+    }
+}

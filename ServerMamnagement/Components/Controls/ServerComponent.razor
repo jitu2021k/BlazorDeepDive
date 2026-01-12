@@ -1,0 +1,29 @@
+﻿
+<li @key="server.Id">
+    <span style="color:@(server.IsOnline ? "green" : "red")">
+        Server is @server.Name from @server.City is @(server.IsOnline ? "Online" : "Offline")
+    </span>
+    &nbsp;
+    <a href="/servers/edit/@server.Id" class=" btn btn-link">Edit</a>
+    &nbsp;
+    <EditForm Model="server"
+              FormName="@($"form-server-{server.Id}")"
+              OnValidSubmit="@(()=>{DeleteServer(server.Id);})">
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </EditForm>
+</li>
+
+@code {
+    
+    [Parameter]
+    public Server? server { get; set; }
+
+    private void DeleteServer(int serverId)
+    {
+        if (serverId > 0)
+        {
+            ServersRepository.DeleteServer(serverId);
+            //NavigationManager.NavigateTo("/servers");
+        }
+    }
+}
