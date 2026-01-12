@@ -1,43 +1,63 @@
-﻿
-<li @key="server.Id" style="background-color:@GetBackgroundColor()">
-    Server is @server.Name from @server.City is
-    <span style="color:@(server.IsOnline ? "green" : "red")">
-         @(server.IsOnline ? "Online" : "Offline")
-    </span>
-    &nbsp;
-    <button type="button" 
-            class="btn @(server.IsOnline? "btn-outline-danger": "btn-outline-success")"
-            @onclick="()=> {HandleServerUpdate(server.Id);}">
-       @(server.IsOnline?"Turn Off":"Turn On")
-    </button>
-    &nbsp;
-
-    @if (server.IsOnline)
-    {
-        Random random = new Random();
-        int randomNumber = random.Next(0, 500);
-        <text>@randomNumber</text>
-    }
-    else
-    {
-        <text>N/A</text>
-    }
-
-    &nbsp;
-    <a href="/servers/edit/@server.Id" class=" btn btn-link">Edit</a>
-    &nbsp;
-    <EditForm Model="server"
-              FormName="@($"form-server-{server.Id}")"
-              OnValidSubmit="@(()=>{DeleteServer(server.Id);})">
-        <button type="submit" class="btn btn-danger">Delete</button>
-    </EditForm>
-</li>
+﻿@if (Server != null)
+{
+    <tr style="background-color: @GetBackgroundColor()">
+        <td>
+            @Server.Name
+        </td>
+        <td>
+            @Server.City
+        </td>
+        <td style="color:@((Server.IsOnline ? "green" : "red"))">
+            @(Server.IsOnline ? "online" : "offline")
+        </td>
+        <td>
+            @if (Server.IsOnline)
+            {
+                Random random = new Random();
+                int randomNumber = random.Next(0, 500);
+                <text>@randomNumber</text>
+            }
+            else
+            {
+                <text>N/A</text>
+            }
+        </td>
+        <td>
+            @if (Server.IsOnline)
+            {
+                <button type="button"
+                        class="btn btn-outline-danger"
+                        @onclick="@(() => { Server.IsOnline = false; })">
+                    Turn Off
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-outline-success"
+                        @onclick="@(() => { Server.IsOnline = true; })">
+                    Turn On
+                </button>
+            }
+            &nbsp;
+            <a href="/server/@Server.Id" class="btn btn-outline-primary">Edit</a>
+        </td>
+        <td>
+            <EditForm Model="Server"
+                      FormName="@($"form-Server-{Server.Id}")"
+                      OnValidSubmit="@(() => { DeleteServer(Server.Id); })"
+                      style="@($"background-color:{GetBackgroundColor()}")">
+                <button type="submit" class="btn btn-primary">Delete</button>
+            </EditForm>
+        </td>
+    </tr>
+}
 
 
 @code {
 
     [Parameter]
-    public Server? server { get; set; }
+    public Server? Server { get; set; }
 
     [CascadingParameter(Name = "SelectedCity")]
     public string? SelectedCity { get; set; }
@@ -54,8 +74,8 @@
 
     private void HandleServerUpdate(int serverId)
     {
-        server?.IsOnline = !server.IsOnline;
-        ServersRepository.UpdateServer(serverId, server);
+        Server?.IsOnline = !Server.IsOnline;
+        ServersRepository.UpdateServer(serverId, Server);
     }
 
     private string GetBackgroundColor()
