@@ -21,22 +21,16 @@
 
 <br />
 
-<ServerListComponent 
-    @rendermode="InteractiveServer"
-    CityName="@this.selectedCity" 
-    SearchFilter="@searchFilter">
-</ServerListComponent>
+<CascadingValue Name="SelectedCity" Value="@selectedCity">
+    <ServerListComponent 
+        @rendermode="InteractiveServer"
+        CityName="@this.selectedCity" 
+        SearchFilter="@searchFilter">
+    </ServerListComponent>
+</CascadingValue>
 
 <a class="btn btn-primary" href="/servers/edit/0">Add Server</a>
 
-<p>
-    <button class="btn btn-secondary"
-    @onclick="@(()=>{
-          //  this.servers.Insert(0,new Server{Name="ServerA",City="Toronto"});    
-        })">
-        Add Server 2
-    </button>
-</p>
 
 @code {
     private string selectedCity = "Toronto";
