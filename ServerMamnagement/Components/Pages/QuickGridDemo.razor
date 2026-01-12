@@ -1,0 +1,116 @@
+﻿@page "/quickgrid"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Quick Grid Demo</h3>
+<br />
+
+@if(servers != null)
+{
+    <QuickGrid @ref ="quickGrid" Items="filteredServers.AsQueryable()" Pagination="paginationState">
+        <PropertyColumn Property="s => s.Name"></PropertyColumn>
+        <PropertyColumn Property="s => s.City" Sortable="true">
+            <ColumnOptions>
+                <input type="search" @bind="cityFilter"
+                     @bind:after="ApplyCityFilter"
+                     placeholder="Filter by city"
+                     class="form-control" />
+            </ColumnOptions>
+        </PropertyColumn>
+        <TemplateColumn Title="Status" Sortable="true" SortBy="GridSort<Server>.ByAscending(x=>x.IsOnline)">
+            @if(context.IsOnline)
+            {
+                <div style="color:green">
+                    Online
+                </div>
+            }
+            else
+            {
+                <div style="color:red">
+                    Offline
+                </div>
+            }
+        </TemplateColumn>
+        <TemplateColumn Title="People Online">
+            @if (context.IsOnline)
+            {
+                Random random = new Random();
+                int randomNumber = random.Next(0, 500);
+                <text>@randomNumber</text>
+            }
+            else
+            {
+                <text>N/A</text>
+            }
+        </TemplateColumn>
+        <TemplateColumn>
+            @if (context.IsOnline)
+            {
+                <button type="button"
+                        class="btn btn-outline-danger"
+                        @onclick="@(() => { context.IsOnline = false; })">
+                    Turn Off
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-outline-success"
+                        @onclick="@(() => { context.IsOnline = true; })">
+                    Turn On
+                </button>
+            }
+        </TemplateColumn>
+        <TemplateColumn>
+            <ChildContent Context="server">
+                <EditForm Model="server"
+                          FormName="@($"form-Server-{server.Id}")"
+                          OnValidSubmit="@(() => { DeleteServer(server.Id); })">
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </EditForm>
+            </ChildContent>
+        </TemplateColumn>
+    </QuickGrid>
+    <Paginator State="paginationState"></Paginator>
+}
+
+@code {
+    private QuickGrid<Server>? quickGrid;
+    private string cityFilter = "";
+    private List<Server>? filteredServers;
+    private List<Server>? servers = ServersRepository.GetServres();
+
+    private PaginationState paginationState = new PaginationState { ItemsPerPage = 5 };
+
+    protected override void OnInitialized()
+    {
+        filteredServers = servers;
+    }
+
+    private void DeleteServer(int serverId)
+    {
+        if (serverId > 0)
+        {
+            ServersRepository.DeleteServer(serverId);
+            NavigationManager.NavigateTo("/quickgrid",true);
+        }
+    }
+
+    private void ApplyCityFilter()
+    {
+        if (string.IsNullOrWhiteSpace(cityFilter))
+        {
+            filteredServers = servers;
+        }
+        else
+        {
+            filteredServers = servers?
+                            .Where(s => s.City.Contains(cityFilter, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+
+            cityFilter = string.Empty;
+            quickGrid?.HideColumnOptionsAsync();
+        }
+    }
+}
