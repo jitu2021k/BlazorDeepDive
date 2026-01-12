@@ -1,40 +1,33 @@
 ﻿@page "/servers/edit/{id:int}"
 
-<h3>EditServer</h3>
-
-
 <EditForm Enhance="true" FormName="server" Model="server" OnSubmit="SaveUpdate">
-        <div class="row mb-3">
-            <InputNumber class="form-control" @bind-Value="server.Id" hidden />
-      
-            <div class="col-2">
-                <label class="col-form-label">Name</label>
-            </div>
-            <div class="col-6 input-width">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <FieldComponent Label="Name">
+        <Control>
             <InputText class="form-control" @bind-Value="server.Name" />
-            </div>
-        </div>
-         <div class="row mb-3">
-            <div class="col-2">
-                <label class="col-form-label">City</label>
-            </div>
-            <div class="col-6 input-width">
+        </Control>
+        <ValidationControl>
+            <ValidationMessage For="()=>server.Name"></ValidationMessage>
+        </ValidationControl>
+    </FieldComponent>
+    <FieldComponent Label="City">
+        <Control>
             <InputText class="form-control" @bind-Value="server.City" />
-            </div>
-         </div>
-            
-        <div class="row mb-3">
-            <div class="col-2">
-                <label class="col-form-label">Is Online</label>
-            </div>
-            <div class="col-6">
+        </Control>
+        <ValidationControl>
+            <ValidationMessage For="() => server.City"></ValidationMessage>
+        </ValidationControl>
+    </FieldComponent>
+    <FieldComponent Label="Is Online">
+        <Control>
             <InputCheckbox class="form-check" @bind-Value="server.IsOnline" />
-            </div>
-        </div>
-        <br />
-        <button class="btn btn-primary" type="submit"> Submit</button>
-        &nbsp;
-        <a href="/servers" class="btn btn-primary">Close</a>
+        </Control>
+    </FieldComponent>
+    <br />
+    <button class="btn btn-primary" type="submit"> Submit</button>
+    &nbsp;
+    <a href="/servers" class="btn btn-primary">Close</a>
 </EditForm>
 
 
